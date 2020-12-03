@@ -20,6 +20,7 @@ const pushNewTag = async () => {
   const versionRegex = /[0-9]+.[0-9]+.[0-9]/gi;
   const rcNumberRegex = /[0-9]+$/i;
   const [packageVersion] = version.match(versionRegex);
+  console.log('test');
 
   // here we use the package version as the source of truth.
   const foundTags = tags.filter((tag) => {
