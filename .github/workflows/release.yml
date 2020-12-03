@@ -10,7 +10,7 @@ jobs:
   push_new_tags:
     name: push new tags
     runs-on: ubuntu-latest
-    if: contains(github.GITHUB_REF, 'refs/heads/release')
+    if: github.GITHUB_REF == 'refs/heads/release'
     env: 
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       COMMIT: ${{github.sha}}
@@ -28,4 +28,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hmarr/debug-action@v1.0.0
-    - run: echo contains(github.GITHUB_REF, 'refs/heads/release')
+    - run: echo github.GITHUB_REF == 'refs/heads/release'
