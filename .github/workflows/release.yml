@@ -1,5 +1,16 @@
 name: Master
-
 on:
   push:
     branches: [release]
+env:
+  NODE_VERSION: 10.22
+
+jobs:
+  push_new_tags:
+    name: push new tags
+    runs-on: ubuntu-latest
+    env: 
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      COMMIT: ${{github.sha}}
+    steps:
+    - run: node ci/pushNewTag

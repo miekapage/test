@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "version": "8.25.9",
+  "main": "index.js",
+  "repository": "git@github.com:youthwar/test.git",
+  "author": "<max@youthwar.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^18.0.11"
+  }
+}
