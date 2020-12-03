@@ -1,15 +1,15 @@
 const { Octokit } = require('@octokit/rest');
 const { version } = require('../package.json');
 const pushNewTag = async () => {
-  const { GITHUB_TOKEN, COMMIT } = process.env;
-  if (!GITHUB_TOKEN) return console.log('You did not supply a Github token');
+  const { TOKEN, COMMIT } = process.env;
+  if (!TOKEN) return console.log('You did not supply a token');
   if (!COMMIT) return console.log('you did not supply a github commit');
 
   const owner = "youthwar";
   const repo = "test"
 
   const octokit = new Octokit({
-    auth: GITHUB_TOKEN,
+    auth: TOKEN,
   });
 
   const { data: tags } = await octokit.repos.listTags({
@@ -20,6 +20,7 @@ const pushNewTag = async () => {
   const versionRegex = /[0-9]+.[0-9]+.[0-9]/gi;
   const rcNumberRegex = /[0-9]+$/i;
   const [packageVersion] = version.match(versionRegex);
+  console.log('test');
 
   // here we use the package version as the source of truth.
   const foundTags = tags.filter((tag) => {

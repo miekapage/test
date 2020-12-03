@@ -11,12 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      TOKEN: ${{secrets.TEST_TOKEN}}
       COMMIT: ${{github.sha}}
     
     steps:
     - uses: actions/checkout@v2
-      with:
-        token: ${{secrets.TEST_TOKEN}}
     - uses: actions/setup-node@v1
       with:
         node-version: ${{env.NODE_VERSION}}
