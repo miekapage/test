@@ -20,7 +20,6 @@ const pushNewTag = async () => {
   const versionRegex = /[0-9]+.[0-9]+.[0-9]/gi;
   const rcNumberRegex = /[0-9]+$/i;
   const [packageVersion] = version.match(versionRegex);
-  console.log('test');
 
   // here we use the package version as the source of truth.
   const foundTags = tags.filter((tag) => {
@@ -33,7 +32,9 @@ const pushNewTag = async () => {
 
   if (foundTags.length) {
     // any version at this point is acceptable
-    newVersionNumber = foundTags[0].name.match(versionRegex)[0];
+    const { name } = foundTags[0];
+    [newVersionNumber] = name.match(versionRegex);
+
     let latestRcNumber = 0;
     // iterating here to find what the latest rc number should be.
     foundTags.forEach((tag) => {
@@ -58,17 +59,21 @@ const pushNewTag = async () => {
     type: 'commit',
   });
 
-  const newResult = await octokit.git.createRef({
+  const { status } = await octokit.git.createRef({
     owner,
     repo,
     ref: `refs/tags/${newTag}`,
     sha: data.sha,
   });
 
-  console.log(newResult);
   
-
-  console.log(newTag);
+  console.log(status);
+  
+  if (status === 201) {
+    console.log('success');
+    console.log(newTag);
+  }
+  
 };
 
 pushNewTag();
