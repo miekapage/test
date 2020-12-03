@@ -1,15 +1,15 @@
 const { Octokit } = require('@octokit/rest');
 const { version } = require('../package.json');
 const pushNewTag = async () => {
-  const { TOKEN, COMMIT } = process.env;
-  if (!TOKEN) return console.log('You did not supply a token');
+  const { GITHUB_TOKEN, COMMIT } = process.env;
+  if (!GITHUB_TOKEN) return console.log('You did not supply a token');
   if (!COMMIT) return console.log('you did not supply a github commit');
 
   const owner = "youthwar";
   const repo = "test"
 
   const octokit = new Octokit({
-    auth: TOKEN,
+    auth: GITHUB_TOKEN,
   });
 
   const { data: tags } = await octokit.repos.listTags({
