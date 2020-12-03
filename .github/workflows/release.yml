@@ -10,7 +10,7 @@ jobs:
   push_new_tags:
     name: push new tags
     runs-on: ubuntu-latest
-    if: github.event_type === push
+    if: github.event_type == push
     env: 
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       COMMIT: ${{github.sha}}
