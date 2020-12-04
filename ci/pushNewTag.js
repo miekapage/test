@@ -2,7 +2,7 @@ const { Octokit } = require('@octokit/rest');
 const { version } = require('../package.json');
 const pushNewTag = async () => {
   const { GITHUB_TOKEN, COMMIT } = process.env;
-  if (!GITHUB_TOKEN) return console.log('You did not supply a Github token');
+  if (!GITHUB_TOKEN) return console.log('You did not supply a token');
   if (!COMMIT) return console.log('you did not supply a github commit');
 
   const owner = "youthwar";
@@ -32,7 +32,9 @@ const pushNewTag = async () => {
 
   if (foundTags.length) {
     // any version at this point is acceptable
-    newVersionNumber = foundTags[0].name.match(versionRegex)[0];
+    const { name } = foundTags[0];
+    [newVersionNumber] = name.match(versionRegex);
+
     let latestRcNumber = 0;
     // iterating here to find what the latest rc number should be.
     foundTags.forEach((tag) => {
@@ -57,17 +59,21 @@ const pushNewTag = async () => {
     type: 'commit',
   });
 
-  const newResult = await octokit.git.createRef({
+  const { status } = await octokit.git.createRef({
     owner,
     repo,
     ref: `refs/tags/${newTag}`,
     sha: data.sha,
   });
 
-  console.log(newResult);
   
-
-  console.log(newTag);
+  console.log(status);
+  
+  if (status === 201) {
+    console.log('success');
+    console.log(newTag);
+  }
+  
 };
 
 pushNewTag();

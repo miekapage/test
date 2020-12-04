@@ -2,6 +2,7 @@ name: Release
 on:
   push:
     branches: [release]
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
 env:
   NODE_VERSION: 10.22
 
@@ -9,6 +10,7 @@ jobs:
   push_new_tags:
     name: push new tags
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/release'
     env: 
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       COMMIT: ${{github.sha}}
@@ -19,3 +21,11 @@ jobs:
       with:
         node-version: ${{env.NODE_VERSION}}
     - run: node ci/pushNewTag
+  
+  build_beta: 
+    name: build beta
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hmarr/debug-action@v1.0.0
+    - run: echo github.GITHUB_REF == 'refs/heads/release'
