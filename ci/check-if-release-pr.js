@@ -1,10 +1,9 @@
-const { exitOnError, printInfo } = require('@ihr-web/build-utils');
 const { graphql } = require('@octokit/graphql');
 
 async function checkIfReleasePR() {
   const { GITHUB_COMMIT, GITHUB_TOKEN } = process.env;
 
-  if (!GITHUB_TOKEN) return exitOnError('You did not supply a Github token');
+  if (!GITHUB_TOKEN) return console.error('You did not supply a Github token');
 
   try {
     const query = await graphql({
@@ -50,17 +49,17 @@ async function checkIfReleasePR() {
     if (closed && baseRefName === 'master') {
       const { node } = edges.find(({ node: { name } }) => name === 'RELEASE') || {};
       releasePR = node;
-      printInfo(`PR ${node ? 'has' : 'does not have'} label "RELEASE"`);
+      console.log(`PR ${node ? 'has' : 'does not have'} label "RELEASE"`);
     } else if (!closed) {
-      printInfo('PR not closed');
+      console.log('PR not closed');
     } else {
-      printInfo('PR not to master');
+      console.log('PR not to master');
     }
-    printInfo(`releasePR = ${releasePR}`);
+    console.log(`releasePR = ${releasePR}`);
 
     return releasePR;
   } catch (e) {
-    return exitOnError(e);
+    return console.error(e);
   }
 }
 
