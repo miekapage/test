@@ -1,5 +1,5 @@
-import checkIfReleasePr from './check-if-release-pr';
-import syncRelease from './sync-release';
+const checkIfReleasePr = require('./check-if-release-pr');
+const syncRelease = require('./sync-release');
 
 const syncReleaseWithMaster = async () => {
   let hasReleaseLabel;
