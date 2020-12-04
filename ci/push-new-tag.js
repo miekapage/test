@@ -1,20 +1,22 @@
 const { Octokit } = require('@octokit/rest');
-const { version } = require('../package.json');
+const { version } = require('../../package.json');
+const { exitOnError, printInfo } = require('@ihr-web/build-utils');
+
 const pushNewTag = async () => {
   const { GITHUB_TOKEN, COMMIT } = process.env;
-  if (!GITHUB_TOKEN) return console.log('You did not supply a Github token');
-  if (!COMMIT) return console.log('you did not supply a github commit');
+  if (!GITHUB_TOKEN) return exitOnError('You did not supply a GITHUB_TOKEN');
+  if (!COMMIT) return exitOnError('you did not supply a github commit');
 
-  const owner = "youthwar";
-  const repo = "test"
+  const owner = 'iheartradio';
+  const repo = 'web';
 
   const octokit = new Octokit({
     auth: GITHUB_TOKEN,
   });
 
   const { data: tags } = await octokit.repos.listTags({
-    owner: 'youthwar',
-    repo: 'test',
+    owner,
+    repo,
   });
 
   const versionRegex = /[0-9]+.[0-9]+.[0-9]/gi;
@@ -22,7 +24,7 @@ const pushNewTag = async () => {
   const [packageVersion] = version.match(versionRegex);
 
   // here we use the package version as the source of truth.
-  const foundTags = tags.filter((tag) => {
+  const foundTags = tags.filter(tag => {
     const [nonRcTagName] = tag.name.match(versionRegex);
     return nonRcTagName === packageVersion;
   });
@@ -32,16 +34,17 @@ const pushNewTag = async () => {
 
   if (foundTags.length) {
     // any version at this point is acceptable
-    newVersionNumber = foundTags[0].name.match(versionRegex)[0];
+    const { name } = foundTags[0];
+    [newVersionNumber] = name.match(versionRegex);
+
     let latestRcNumber = 0;
     // iterating here to find what the latest rc number should be.
-    foundTags.forEach((tag) => {
-      let rcCandidate = parseInt(tag.name.match(rcNumberRegex)[0], 10);
-      latestRcNumber = latestRcNumber >=  rcCandidate ? latestRcNumber : rcCandidate;
+    foundTags.forEach(tag => {
+      const rcCandidate = parseInt(tag.name.match(rcNumberRegex)[0], 10);
+      latestRcNumber = latestRcNumber >= rcCandidate ? latestRcNumber : rcCandidate;
     });
     newRcNumber = latestRcNumber + 1;
   } else {
-
     newVersionNumber = packageVersion;
     newRcNumber = 0;
   }
@@ -57,17 +60,18 @@ const pushNewTag = async () => {
     type: 'commit',
   });
 
-  const newResult = await octokit.git.createRef({
+  const { status } = await octokit.git.createRef({
     owner,
     repo,
     ref: `refs/tags/${newTag}`,
     sha: data.sha,
   });
 
-  console.log(newResult);
-  
-
-  console.log(newTag);
+  if (status === 201) {
+    return printInfo(`New Tag pushed: ${newTag}`);
+  } else {
+    return exitOnError(` returned a ${status} status`);
+  }
 };
 
 pushNewTag();

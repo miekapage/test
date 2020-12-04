@@ -1,27 +1,42 @@
 const { Octokit } = require('@octokit/rest');
+const { exitOnError, printInfo } = require('@ihr-web/build-utils');
 
 const syncRelease = async () => {
-  const { GITHUB_TOKEN, COMMIT } = process.env;
+  const { GITHUB_TOKEN, GITHUB_COMMIT } = process.env;
 
-  const owner = "youthwar";
-  const repo = "test"
+  const owner = 'iheartradio';
+  const repo = 'web';
 
   const octokit = new Octokit({
     auth: GITHUB_TOKEN,
   });
 
-  const { data: commit } = await octokit.git.getCommit({
-    owner,
-    repo,
-    commit_sha: COMMIT,
-  });
+  let commit;
 
-  const { data } = await octokit.search.users({
-    q: `${commit.author.email} in:email`
-  });
+  try {
+    const { data } = await octokit.git.getCommit({
+      owner,
+      repo,
+      commit_sha: GITHUB_COMMIT,
+    });
 
-  const [ user ] = data.items;
-  const refName = COMMIT.substr(0,7);
+    commit = data;
+  } catch (e) {
+    exitOnError(e);
+  }
+
+  let user;
+
+  try {
+    const { data } = await octokit.search.users({
+      q: `${commit.author.email} in:email`,
+    });
+    [user] = data.items;
+  } catch (e) {
+    exitOnError(e);
+  }
+
+  const refName = GITHUB_COMMIT.substr(0, 7);
   let createdRef;
 
   try {
@@ -29,27 +44,26 @@ const syncRelease = async () => {
       owner,
       repo,
       ref: `refs/heads/master-release-sync-${refName}`,
-      sha: COMMIT,
+      sha: GITHUB_COMMIT,
     });
     createdRef = data.ref;
   } catch (e) {
-    // cant create a branch!
+    exitOnError(e);
   }
-  
 
   try {
     // this is silly.
-    const message  = [
-      "@",
+    const message = [
+      '@',
       user.login,
-      " has pushed [this commit](",
-      "https://github.com/",
+      ' has pushed [this commit](',
+      'https://github.com/',
       owner,
-      "/",
+      '/',
       repo,
-      "/commit/",
-      COMMIT,
-      ") to master with a label of release."
+      '/commit/',
+      GITHUB_COMMIT,
+      ') to master with a label of release.',
     ].join('');
 
     await octokit.pulls.create({
@@ -60,21 +74,17 @@ const syncRelease = async () => {
       maintainer_can_modify: true,
       title: 'Test',
       draft: false,
-      body: message
+      body: message,
     });
   } catch (e) {
-    console.log(e);
-    console.log('uh oh, cleaning up the branch because a pr could not be created');
     await octokit.git.deleteRef({
       owner,
       repo,
       ref: createdRef,
     });
-
   }
 
-  console.log('successful')
-  
+  printInfo('Successfully created a new pr!');
 };
 
 syncRelease();
