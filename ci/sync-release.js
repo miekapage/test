@@ -33,7 +33,7 @@ const syncRelease = async () => {
     });
     createdRef = data.ref;
   } catch (e) {
-
+    // cant create a branch!
   }
   
 
@@ -64,6 +64,12 @@ const syncRelease = async () => {
     });
   } catch (e) {
     console.log(e);
+    console.log('uh oh, cleaning up the branch because a pr could not be created');
+    await octokit.git.deleteRef({
+      owner,
+      repo,
+      ref: createdRef,
+    });
 
   }
 
