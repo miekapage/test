@@ -21,9 +21,6 @@ const syncRelease = async () => {
   });
 
   const [ user ] = data.items;
-
-  console.log({ user });
-
   const refName = COMMIT.substr(0,7);
   let createdRef;
 
@@ -36,15 +33,15 @@ const syncRelease = async () => {
     });
     createdRef = data.ref;
   } catch (e) {
-    
+
   }
 
   console.log(createdRef);
   try {
-    const result = await octokit.pulls.create({
+    await octokit.pulls.create({
       owner,
       repo,
-      head: createdRef.ref,
+      head: createdRef,
       base: 'release',
       maintainer_can_modify: true,
       title: 'Test',
@@ -58,9 +55,8 @@ const syncRelease = async () => {
     console.log(e);
 
   }
-  
-  
-  console.log({ result })
+
+  console.log('successful')
   
 };
 
