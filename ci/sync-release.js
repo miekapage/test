@@ -1,5 +1,4 @@
 const { Octokit } = require('@octokit/rest');
-const { exitOnError, printInfo } = require('@ihr-web/build-utils');
 
 const syncRelease = async () => {
   const { GITHUB_TOKEN, GITHUB_COMMIT } = process.env;
@@ -22,7 +21,7 @@ const syncRelease = async () => {
 
     commit = data;
   } catch (e) {
-    exitOnError(e);
+    console.error(e);
   }
 
   let user;
@@ -33,7 +32,7 @@ const syncRelease = async () => {
     });
     [user] = data.items;
   } catch (e) {
-    exitOnError(e);
+    console.error(e);
   }
 
   const refName = GITHUB_COMMIT.substr(0, 7);
@@ -48,7 +47,7 @@ const syncRelease = async () => {
     });
     createdRef = data.ref;
   } catch (e) {
-    exitOnError(e);
+    console.error(e);
   }
 
   try {
@@ -84,7 +83,7 @@ const syncRelease = async () => {
     });
   }
 
-  printInfo('Successfully created a new pr!');
+  console.log('Successfully created a new pr!');
 };
 
 syncRelease();
