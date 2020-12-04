@@ -1,0 +1,24 @@
+name: Master
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'rfcs/**'
+env:
+  NODE_VERSION: 10.22
+
+jobs:
+  sync_master_and_release:
+    name: Sync Master & Release
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      GITHUB_COMMIT: ${{github.sha}}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{env.NODE_VERSION}}
+    - run: yarn install --ignore-optional
+    - run: yarn automate-release
