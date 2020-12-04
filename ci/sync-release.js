@@ -86,4 +86,4 @@ const syncRelease = async () => {
   console.log('Successfully created a new pr!');
 };
 
-syncRelease();
+module.exports = syncRelease;
