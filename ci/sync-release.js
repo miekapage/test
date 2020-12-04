@@ -38,12 +38,20 @@ const syncRelease = async () => {
   
 
   try {
-    const message  = `
-      @${user.login} has pushed [this commit](https://github.com/${owner}/${repo}/commit/${COMMIT})
-      to master with a label of release.
-    `;
+    // this is silly.
+    const message  = [
+      "@",
+      user.login,
+      " has pushed [this commit](",
+      "https://github.com/",
+      owner,
+      "/",
+      repo,
+      "/commit/",
+      COMMIT,
+      ") to master with a label of release."
+    ].join('');
 
-    const cleanMessage = message.replace('\n', ' ');
     await octokit.pulls.create({
       owner,
       repo,
@@ -52,7 +60,7 @@ const syncRelease = async () => {
       maintainer_can_modify: true,
       title: 'Test',
       draft: false,
-      body: cleanMessage
+      body: message
     });
   } catch (e) {
     console.log(e);
