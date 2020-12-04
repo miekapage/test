@@ -5,6 +5,7 @@ const syncReleaseWithMaster = async () => {
   let hasReleaseLabel;
   try {
     hasReleaseLabel = checkIfReleasePr();
+    console.log(`hasReleaseLabel = ${hasReleaseLabel}`)
   } catch (e) {
     console.error(`error determining if there was a release label ${e}`);
   }
