@@ -46,10 +46,19 @@ const syncRelease = async () => {
       maintainer_can_modify: true,
       title: 'Test',
       draft: false,
-      body: `
-        @${user.login} has committed this branch to master with a label of release.
-        The original commit can be found [here](https://github.com/${owner}/${repo}/commit/${COMMIT})
-      `
+      body: [
+        "@",
+        user.login,
+        " has committed [this](",
+        "https://github.com/",
+        owner,
+        "/",
+        repo,
+        "commit/",
+        COMMIT,
+        ")",
+        " to master with a label of release"
+      ].join(''),
     });
   } catch (e) {
     console.log(e);
